@@ -4,6 +4,14 @@ refs:
   - &container
     docker:
       - image: circleci/node:10
+      - image: mongo:3.6.10-stretch
+        name: mongo-three
+        environment:
+          MONGO_INITDB_DATABASE: database
+      - image: mongo:4.1.7-xenial
+        name: mongo-four
+        environment:
+          MONGO_INITDB_DATABASE: database
     working_directory: ~/repo
   - &docker_setup
     setup_remote_docker:
@@ -25,10 +33,11 @@ refs:
   - &test
     run:
       name: Test
-      command:
-        (docker pull mongo:3.6.10-stretch & docker pull mongo:4.1.7-xenial) &&
-        (docker run --detach -p 27023:27017 --env MONGO_INITDB_DATABASE=database mongo:3.6.10-stretch & docker run --detach -p 27024:27017 --env MONGO_INITDB_DATABASE=database mongo:4.1.7-xenial) &&
-        docker build -t then-mongo-test . && docker run then-mongo-test
+      command: MONGO_3=mongodb://mongo-three:27017/database MONGO_4=mongodb://mongo-four:27017/database node test
+      # command:
+      #   (docker pull mongo:3.6.10-stretch & docker pull mongo:4.1.7-xenial) &&
+      #   (docker run --detach -p 27023:27017 --env MONGO_INITDB_DATABASE=database mongo:3.6.10-stretch & docker run --detach -p 27024:27017 --env MONGO_INITDB_DATABASE=database mongo:4.1.7-xenial) &&
+      #   docker build -t then-mongo-test . && docker run then-mongo-test
 
 jobs:
   all:
@@ -38,7 +47,7 @@ jobs:
       - *restore_cache
       - *yarn_install
       - *save_cache
-      - *docker_setup
+      # - *docker_setup
       - *test
 
   master:
