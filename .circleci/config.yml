@@ -21,11 +21,14 @@ refs:
   - &yarn_install
     run:
       name: Yarn Install
-      command: yarn
+      command: yarn --frozen-lockfile
   - &test
     run:
       name: Test
-      command: node test
+      command:
+        (docker pull mongo:3.6.10-stretch & docker pull mongo:4.1.7-xenial) &&
+        (docker run --detach -p 27023:27017 --env MONGO_INITDB_DATABASE=database mongo:3.6.10-stretch & docker run --detach -p 27024:27017 --env MONGO_INITDB_DATABASE=database mongo:4.1.7-xenial) &&
+        docker build -t then-mongo-test . && docker run then-mongo-test
 
 jobs:
   all:

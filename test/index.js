@@ -31,6 +31,7 @@ async function getConnectionString(envName, image) {
   await new Promise(resolve => setTimeout(resolve, 5000));
   return {CONNECTION_STRING, kill};
 }
+
 Object.keys(images).forEach(async envName => {
   const image = images[envName];
   test(
