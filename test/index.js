@@ -9,6 +9,10 @@ const images = {
   MONGO_3: 'mongo:3.6.10-stretch',
   MONGO_4: 'mongo:4.1.7-xenial',
 };
+const versions = {
+  MONGO_3: [3, 6, 10, 0],
+  MONGO_4: [4, 1, 7, 0],
+};
 const DEFAULT_PORT = 27017;
 const MONGO_INITDB_DATABASE = 'database';
 
@@ -17,7 +21,6 @@ async function getConnectionString(envName, image) {
     return {CONNECTION_STRING: process.env[envName], kill: async () => {}};
   }
   const {kill, externalPort} = await withContainer.default({
-    debug: true,
     image,
     containerName: 'then-mongo-test',
     defaultExternalPort: DEFAULT_PORT,
@@ -75,6 +78,11 @@ Object.keys(images).forEach(async envName => {
       test('count', async () => {
         const count = await db.values.find().count();
         assert.strictEqual(count, 4);
+      });
+
+      test('version=' + versions[envName].slice(0, 3).join('.'), async () => {
+        const {versionArray} = await db.runCommand({buildInfo: 1});
+        assert.deepEqual(versionArray, versions[envName]);
       });
 
       test('db.close()', async () => {

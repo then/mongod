@@ -33,11 +33,7 @@ refs:
   - &test
     run:
       name: Test
-      command: MONGO_3=mongodb://mongo-three:27017/database MONGO_4=mongodb://mongo-four:27017/database node test
-      # command:
-      #   (docker pull mongo:3.6.10-stretch & docker pull mongo:4.1.7-xenial) &&
-      #   (docker run --detach -p 27023:27017 --env MONGO_INITDB_DATABASE=database mongo:3.6.10-stretch & docker run --detach -p 27024:27017 --env MONGO_INITDB_DATABASE=database mongo:4.1.7-xenial) &&
-      #   docker build -t then-mongo-test . && docker run then-mongo-test
+      command: MONGO_3=mongodb://mongo-three:27017/database MONGO_4=mongodb://mongo-four:27017/database yarn test
 
 jobs:
   all:
